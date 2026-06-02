@@ -2,40 +2,95 @@
 
 import { useState } from "react";
 
-// Placeholder: form for submitting a claim to the oracle.
-// TODO: wire onSubmit to the agent/contract pipeline and handle validation.
+// Submission form — present your case to the gatekeeper.
+// TODO: wire onSubmit to the Somnia Agent pipeline and add real validation.
+const FIELD =
+  "w-full rounded-xl border border-border bg-surface/60 px-4 py-3 text-base text-foreground placeholder:text-muted/60 outline-none transition-all duration-300 focus:border-gold/60 focus:bg-surface focus:shadow-[0_0_0_1px_rgba(244,217,123,0.25),0_0_22px_rgba(244,217,123,0.12)]";
+
 export default function SubmissionForm({ onSubmit }) {
-  const [claim, setClaim] = useState("");
+  const [idea, setIdea] = useState("");
+  const [github, setGithub] = useState("");
+  const [website, setWebsite] = useState("");
 
   function handleSubmit(event) {
     event.preventDefault();
-    if (!claim.trim()) return;
+    if (!idea.trim()) return;
     // TODO: replace with real submission logic.
-    onSubmit?.(claim.trim());
+    onSubmit?.({
+      idea: idea.trim(),
+      github: github.trim(),
+      website: website.trim(),
+    });
   }
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="mx-auto flex w-full max-w-xl flex-col gap-4 px-6"
+      className="panel mx-auto flex w-full max-w-xl flex-col gap-6 p-6 sm:p-8"
     >
-      <label htmlFor="claim" className="text-sm font-medium">
-        Your claim
-      </label>
-      <textarea
-        id="claim"
-        value={claim}
-        onChange={(event) => setClaim(event.target.value)}
-        rows={5}
-        placeholder="Enter the statement you want judged…"
-        className="rounded-lg border border-black/[.08] bg-transparent p-3 text-base outline-none focus:border-foreground dark:border-white/[.145]"
-      />
+      {/* Startup Idea */}
+      <div className="flex flex-col gap-2">
+        <label
+          htmlFor="idea"
+          className="text-xs uppercase tracking-[0.2em] text-muted"
+        >
+          Startup Idea
+        </label>
+        <textarea
+          id="idea"
+          value={idea}
+          onChange={(event) => setIdea(event.target.value)}
+          rows={5}
+          required
+          placeholder="Describe the idea you bring before the gate…"
+          className={`${FIELD} resize-none`}
+        />
+      </div>
+
+      {/* GitHub URL */}
+      <div className="flex flex-col gap-2">
+        <label
+          htmlFor="github"
+          className="text-xs uppercase tracking-[0.2em] text-muted"
+        >
+          GitHub URL
+        </label>
+        <input
+          id="github"
+          type="url"
+          inputMode="url"
+          value={github}
+          onChange={(event) => setGithub(event.target.value)}
+          placeholder="https://github.com/you/project"
+          className={FIELD}
+        />
+      </div>
+
+      {/* Portfolio Website URL */}
+      <div className="flex flex-col gap-2">
+        <label
+          htmlFor="website"
+          className="text-xs uppercase tracking-[0.2em] text-muted"
+        >
+          Portfolio Website URL
+        </label>
+        <input
+          id="website"
+          type="url"
+          inputMode="url"
+          value={website}
+          onChange={(event) => setWebsite(event.target.value)}
+          placeholder="https://yourportfolio.com"
+          className={FIELD}
+        />
+      </div>
+
       <button
         type="submit"
-        className="flex h-12 items-center justify-center rounded-full bg-foreground px-6 text-background transition-colors hover:opacity-90 disabled:opacity-50"
-        disabled={!claim.trim()}
+        disabled={!idea.trim()}
+        className="glow-gold mt-2 flex h-12 items-center justify-center rounded-full bg-surface-elevated font-display text-sm uppercase tracking-[0.2em] text-gold-bright transition-all hover:scale-[1.02] hover:bg-surface disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
       >
-        Submit to oracle
+        Face the Gatekeeper
       </button>
     </form>
   );
