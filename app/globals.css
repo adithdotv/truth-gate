@@ -1,27 +1,30 @@
 @import "tailwindcss";
 
 /*
-  Truth Gate — "oracle vault" theme.
-  Black sanctum, gilded gold, ritual emerald, glowing accents.
-  Mystical minimalism: let darkness and a little glow do the work.
+  TruthGate — dark futuristic oracle theme.
+  Black void · gold + emerald glow · smooth gradients · minimal sci-fi.
 */
 
 :root {
   /* Surfaces — from the void outward */
-  --background: #060605; /* the vault — near-black, warm */
-  --surface: #0d0c0a; /* raised panel */
-  --surface-elevated: #14120e; /* cards, modals */
-  --border: #2a2519; /* dim gilded hairline */
+  --background: #040506; /* the void — near-black, faint cool cast */
+  --surface: #0b0d0e; /* raised panel */
+  --surface-elevated: #121517; /* cards, modals */
+  --border: #23282b; /* dim hairline */
 
   /* Text */
-  --foreground: #ece6d8; /* parchment */
-  --muted: #8a8270; /* faded inscription */
+  --foreground: #eceae3; /* clean off-white */
+  --muted: #8b9088; /* dimmed label */
 
-  /* Sacred accents */
-  --gold: #c9a227; /* aged temple gold */
-  --gold-bright: #f4d97b; /* lit gold leaf */
-  --emerald: #0f9d70; /* deep ritual emerald */
-  --emerald-bright: #34e3a8; /* charged emerald glow */
+  /* Accents */
+  --gold: #c9a227; /* core gold */
+  --gold-bright: #f4d97b; /* lit gold */
+  --emerald: #0f9d70; /* core emerald */
+  --emerald-bright: #34e3a8; /* charged emerald */
+
+  /* Glow primitives (rgb triplets for alpha composition) */
+  --glow-gold-rgb: 244 217 123;
+  --glow-emerald-rgb: 52 227 168;
 }
 
 @theme inline {
@@ -42,29 +45,74 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* Always dark — the vault has no daylight. */
+/* ── Base ─────────────────────────────────────────────────────── */
+
+/* Always dark — the oracle has no daylight. */
 html {
   color-scheme: dark;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.65;
+  letter-spacing: -0.011em;
 
-  /* Faint pools of light bleeding through the dark — gold above, emerald below. */
+  /* Crisp type on dark surfaces. */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+
+  /* Smooth layered light: gold drifting from above, emerald from below,
+     over a soft radial vignette that keeps the edges in shadow. */
   background-image:
     radial-gradient(
-      60rem 60rem at 50% -10%,
-      rgba(201, 162, 39, 0.08),
+      55rem 40rem at 50% -8%,
+      rgb(var(--glow-gold-rgb) / 0.07),
       transparent 60%
     ),
     radial-gradient(
-      50rem 50rem at 50% 120%,
-      rgba(15, 157, 112, 0.07),
+      48rem 42rem at 50% 112%,
+      rgb(var(--glow-emerald-rgb) / 0.06),
       transparent 60%
+    ),
+    radial-gradient(
+      120% 120% at 50% 0%,
+      transparent 55%,
+      rgba(0, 0, 0, 0.55) 100%
     );
   background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+/* Clean typographic rhythm — tight, balanced headings. */
+h1,
+h2,
+h3,
+h4 {
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Visible, on-theme focus for keyboard users. */
+:focus-visible {
+  outline: 1px solid var(--gold);
+  outline-offset: 3px;
+  border-radius: 2px;
 }
 
 /* Display type for invocations and verdicts. */
@@ -73,55 +121,111 @@ body {
   letter-spacing: 0.02em;
 }
 
-/* ── Glow utilities ──────────────────────────────────────────── */
+/* ── Accent utilities ─────────────────────────────────────────── */
 
 @utility text-glow-gold {
   color: var(--gold-bright);
   text-shadow:
-    0 0 8px rgba(244, 217, 123, 0.45),
-    0 0 24px rgba(201, 162, 39, 0.25);
+    0 0 8px rgb(var(--glow-gold-rgb) / 0.45),
+    0 0 24px rgb(var(--glow-gold-rgb) / 0.22);
 }
 
 @utility text-glow-emerald {
   color: var(--emerald-bright);
   text-shadow:
-    0 0 8px rgba(52, 227, 168, 0.45),
-    0 0 24px rgba(15, 157, 112, 0.25);
+    0 0 8px rgb(var(--glow-emerald-rgb) / 0.45),
+    0 0 24px rgb(var(--glow-emerald-rgb) / 0.22);
+}
+
+/* Gold → emerald gradient text — the oracle's signature. */
+@utility text-gradient {
+  background: linear-gradient(
+    100deg,
+    var(--gold-bright),
+    var(--gold) 35%,
+    var(--emerald) 70%,
+    var(--emerald-bright)
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
 }
 
 @utility glow-gold {
   box-shadow:
-    0 0 0 1px rgba(201, 162, 39, 0.35),
-    0 0 18px rgba(201, 162, 39, 0.22),
-    inset 0 0 24px rgba(201, 162, 39, 0.06);
+    0 0 0 1px rgb(var(--glow-gold-rgb) / 0.3),
+    0 0 22px rgb(var(--glow-gold-rgb) / 0.18),
+    inset 0 0 28px rgb(var(--glow-gold-rgb) / 0.05);
 }
 
 @utility glow-emerald {
   box-shadow:
-    0 0 0 1px rgba(15, 157, 112, 0.4),
-    0 0 18px rgba(52, 227, 168, 0.22),
-    inset 0 0 24px rgba(15, 157, 112, 0.06);
+    0 0 0 1px rgb(var(--glow-emerald-rgb) / 0.34),
+    0 0 22px rgb(var(--glow-emerald-rgb) / 0.18),
+    inset 0 0 28px rgb(var(--glow-emerald-rgb) / 0.05);
 }
 
-/* A thin gilded divider — like a seam in the vault door. */
-@utility rule-gold {
+/* Frosted vault panel — elevated surface with a soft inner sheen. */
+@utility panel {
+  background: linear-gradient(
+    180deg,
+    var(--surface-elevated),
+    var(--surface)
+  );
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  backdrop-filter: blur(8px);
+}
+
+/* A thin gradient divider — gold fading into emerald. */
+@utility rule-aurora {
   height: 1px;
+  border: 0;
   background: linear-gradient(
     90deg,
     transparent,
-    var(--gold) 50%,
+    var(--gold) 40%,
+    var(--emerald) 60%,
     transparent
   );
-  opacity: 0.5;
+  opacity: 0.45;
 }
 
-/* Selection picks up the ritual emerald. */
+/* Slow breathing glow for focal elements (respects reduced motion). */
+@utility pulse-glow {
+  animation: pulse-glow 4s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px rgb(var(--glow-gold-rgb) / 0.28),
+      0 0 18px rgb(var(--glow-gold-rgb) / 0.14);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgb(var(--glow-gold-rgb) / 0.4),
+      0 0 30px rgb(var(--glow-gold-rgb) / 0.28);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .pulse-glow {
+    animation: none;
+  }
+}
+
+/* Selection + scrollbar pick up the accents. */
 ::selection {
-  background: rgba(52, 227, 168, 0.25);
+  background: rgb(var(--glow-emerald-rgb) / 0.25);
   color: var(--foreground);
 }
 
-/* Themed scrollbar for the vault. */
 * {
+  scrollbar-width: thin;
   scrollbar-color: var(--gold) transparent;
 }
