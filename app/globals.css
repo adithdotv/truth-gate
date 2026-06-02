@@ -210,11 +210,74 @@ a {
   }
 }
 
+/* ── Cinematic motion (hero) ──────────────────────────────────── */
+
+/* A soft blurred light source — composited into drifting orbs. */
+@utility orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(40px);
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+/* Slow wandering drift for background orbs. */
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.75;
+  }
+  50% {
+    transform: translate3d(4%, -6%, 0) scale(1.12);
+    opacity: 1;
+  }
+}
+
+@utility animate-drift {
+  animation: drift 16s ease-in-out infinite;
+}
+
+@utility animate-drift-slow {
+  animation: drift 24s ease-in-out infinite reverse;
+}
+
+/* The gate ring — a halo turning slowly behind the title. */
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@utility animate-spin-slow {
+  animation: spin-slow 48s linear infinite;
+}
+
+/* Title shimmer — sweeps light across the gradient text. */
+@keyframes shimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@utility animate-shimmer {
+  background-size: 200% auto;
+  animation: shimmer 8s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
-  .pulse-glow {
+  .pulse-glow,
+  .animate-drift,
+  .animate-drift-slow,
+  .animate-spin-slow,
+  .animate-shimmer {
     animation: none;
   }
 }
