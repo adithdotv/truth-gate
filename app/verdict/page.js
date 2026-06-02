@@ -1,10 +1,9 @@
-import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import VerdictCard from "@/components/VerdictCard";
 
 // Verdict route — the gate's ruling.
-// TODO: fetch the real verdict (by id) from the agent/contract instead of
-// echoing the submitted claim from the query string.
+// TODO: fetch the real verdict (by id) from the Somnia Agent instead of
+// rendering the placeholder ruling below.
 export default async function VerdictPage({ searchParams }) {
   const params = await searchParams;
   const claim = params?.claim ?? "";
@@ -12,25 +11,8 @@ export default async function VerdictPage({ searchParams }) {
   return (
     <>
       <Navbar />
-      <main className="flex flex-1 flex-col items-center justify-center gap-10 py-24">
-        <header className="px-6 text-center">
-          <h1 className="font-display text-3xl text-glow-emerald">
-            The gate has spoken
-          </h1>
-        </header>
-
-        <VerdictCard
-          verdict="granted"
-          claim={claim || "No claim was presented."}
-          reason="Placeholder ruling — wire this to the Somnia Agent's response."
-        />
-
-        <Link
-          href="/submit"
-          className="font-display text-sm uppercase tracking-widest text-gold transition-colors hover:text-glow-gold"
-        >
-          Present another claim
-        </Link>
+      <main className="flex min-h-[100svh] flex-1 flex-col items-center justify-center px-6 py-20">
+        <VerdictCard status="APPROVED" score={87} claim={claim} />
       </main>
     </>
   );
