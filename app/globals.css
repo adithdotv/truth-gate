@@ -1,26 +1,127 @@
 @import "tailwindcss";
 
+/*
+  Truth Gate — "oracle vault" theme.
+  Black sanctum, gilded gold, ritual emerald, glowing accents.
+  Mystical minimalism: let darkness and a little glow do the work.
+*/
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Surfaces — from the void outward */
+  --background: #060605; /* the vault — near-black, warm */
+  --surface: #0d0c0a; /* raised panel */
+  --surface-elevated: #14120e; /* cards, modals */
+  --border: #2a2519; /* dim gilded hairline */
+
+  /* Text */
+  --foreground: #ece6d8; /* parchment */
+  --muted: #8a8270; /* faded inscription */
+
+  /* Sacred accents */
+  --gold: #c9a227; /* aged temple gold */
+  --gold-bright: #f4d97b; /* lit gold leaf */
+  --emerald: #0f9d70; /* deep ritual emerald */
+  --emerald-bright: #34e3a8; /* charged emerald glow */
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-border: var(--border);
+
   --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+
+  --color-gold: var(--gold);
+  --color-gold-bright: var(--gold-bright);
+  --color-emerald: var(--emerald);
+  --color-emerald-bright: var(--emerald-bright);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Always dark — the vault has no daylight. */
+html {
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
+
+  /* Faint pools of light bleeding through the dark — gold above, emerald below. */
+  background-image:
+    radial-gradient(
+      60rem 60rem at 50% -10%,
+      rgba(201, 162, 39, 0.08),
+      transparent 60%
+    ),
+    radial-gradient(
+      50rem 50rem at 50% 120%,
+      rgba(15, 157, 112, 0.07),
+      transparent 60%
+    );
+  background-attachment: fixed;
+}
+
+/* Display type for invocations and verdicts. */
+.font-display {
+  font-family: var(--font-cinzel), var(--font-geist-sans), serif;
+  letter-spacing: 0.02em;
+}
+
+/* ── Glow utilities ──────────────────────────────────────────── */
+
+@utility text-glow-gold {
+  color: var(--gold-bright);
+  text-shadow:
+    0 0 8px rgba(244, 217, 123, 0.45),
+    0 0 24px rgba(201, 162, 39, 0.25);
+}
+
+@utility text-glow-emerald {
+  color: var(--emerald-bright);
+  text-shadow:
+    0 0 8px rgba(52, 227, 168, 0.45),
+    0 0 24px rgba(15, 157, 112, 0.25);
+}
+
+@utility glow-gold {
+  box-shadow:
+    0 0 0 1px rgba(201, 162, 39, 0.35),
+    0 0 18px rgba(201, 162, 39, 0.22),
+    inset 0 0 24px rgba(201, 162, 39, 0.06);
+}
+
+@utility glow-emerald {
+  box-shadow:
+    0 0 0 1px rgba(15, 157, 112, 0.4),
+    0 0 18px rgba(52, 227, 168, 0.22),
+    inset 0 0 24px rgba(15, 157, 112, 0.06);
+}
+
+/* A thin gilded divider — like a seam in the vault door. */
+@utility rule-gold {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--gold) 50%,
+    transparent
+  );
+  opacity: 0.5;
+}
+
+/* Selection picks up the ritual emerald. */
+::selection {
+  background: rgba(52, 227, 168, 0.25);
+  color: var(--foreground);
+}
+
+/* Themed scrollbar for the vault. */
+* {
+  scrollbar-color: var(--gold) transparent;
 }
