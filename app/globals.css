@@ -286,6 +286,22 @@ a {
   animation: fade-in-up 0.5s ease-out both;
 }
 
+/* Page-level entrance — replayed on every route change via template.js. */
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.995);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@utility animate-page-in {
+  animation: page-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 /* Dramatic seal entrance for the verdict status. */
 @keyframes seal-in {
   0% {
@@ -316,7 +332,8 @@ a {
   .animate-spin-slow,
   .animate-shimmer,
   .animate-fade-in-up,
-  .animate-seal-in {
+  .animate-seal-in,
+  .animate-page-in {
     animation: none;
   }
 }

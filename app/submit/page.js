@@ -27,7 +27,9 @@ export default function SubmitPage() {
       <Navbar />
       <main className="flex flex-1 flex-col items-center justify-center gap-10 px-6 pb-24 pt-32">
         {pending ? (
-          <LoadingGate />
+          <div className="animate-fade-in-up flex flex-col items-center">
+            <LoadingGate />
+          </div>
         ) : (
           <>
             <header className="text-center">
