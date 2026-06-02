@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import SubmissionForm from "@/components/SubmissionForm";
 import LoadingGate from "@/components/LoadingGate";
-import OracleText from "@/components/OracleText";
 
 // Submit route — present your claim to the gatekeeper.
 // TODO: replace the simulated delay with a real Somnia Agent call,
@@ -28,10 +27,7 @@ export default function SubmitPage() {
       <Navbar />
       <main className="flex flex-1 flex-col items-center justify-center gap-10 px-6 pb-24 pt-32">
         {pending ? (
-          <>
-            <LoadingGate message="The gate weighs your words…" />
-            <OracleText text="" />
-          </>
+          <LoadingGate />
         ) : (
           <>
             <header className="text-center">
