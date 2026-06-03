@@ -61,10 +61,15 @@ export default function SubmitPage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState(null);
 
-  async function runFlow(githubInput) {
+  async function runFlow(githubInput, portfolioUrl) {
     const username = parseGithubUsername(githubInput);
     if (!username) {
       setError("Enter a valid GitHub username or profile URL.");
+      setPhase("error");
+      return;
+    }
+    if (!/^https:\/\//i.test(portfolioUrl ?? "")) {
+      setError("A valid portfolio URL (https://) is required.");
       setPhase("error");
       return;
     }
@@ -94,6 +99,7 @@ export default function SubmitPage() {
       await runGithubAnalysis({
         signer,
         username,
+        portfolioUrl,
         onStep: (s) => setMessage(s.message),
       });
 
@@ -153,7 +159,9 @@ export default function SubmitPage() {
                 Present your GitHub. The gatekeeper analyzes it onchain.
               </p>
             </header>
-            <SubmissionForm onSubmit={({ github }) => runFlow(github)} />
+            <SubmissionForm
+              onSubmit={({ github, website }) => runFlow(github, website)}
+            />
           </>
         )}
       </main>

@@ -29,23 +29,29 @@ export default function VerdictView({ address }) {
 
   if (error) {
     return (
-      <div className="panel animate-fade-in-up flex w-full max-w-md flex-col items-center gap-5 p-8 text-center">
-        <span className="font-display text-2xl text-[rgb(248_113_113)]">
-          Nothing to reveal
-        </span>
-        <p className="text-muted">{error}</p>
-        <Link
-          href="/submit"
-          className="glow-gold flex h-11 items-center justify-center rounded-full bg-surface-elevated px-7 font-display text-sm uppercase tracking-[0.2em] text-gold-bright transition-all hover:scale-[1.03] hover:bg-surface"
-        >
-          Approach the Gate
-        </Link>
+      <div className="flex min-h-[60vh] w-full items-center justify-center">
+        <div className="panel animate-fade-in-up flex w-full max-w-md flex-col items-center gap-5 p-8 text-center">
+          <span className="font-display text-2xl text-[rgb(248_113_113)]">
+            Nothing to reveal
+          </span>
+          <p className="text-muted">{error}</p>
+          <Link
+            href="/submit"
+            className="glow-gold flex h-11 items-center justify-center rounded-full bg-surface-elevated px-7 font-display text-sm uppercase tracking-[0.2em] text-gold-bright transition-all hover:scale-[1.03] hover:bg-surface"
+          >
+            Approach the Gate
+          </Link>
+        </div>
       </div>
     );
   }
 
   if (!reputation) {
-    return <LoadingGate message="Reading onchain reputation..." />;
+    return (
+      <div className="flex min-h-[60vh] w-full items-center justify-center">
+        <LoadingGate message="Reading onchain reputation..." />
+      </div>
+    );
   }
 
   return <VerdictCard reputation={reputation} />;
