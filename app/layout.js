@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono, Cinzel } from "next/font/google";
 import "./globals.css";
+import WalletProvider from "@/components/WalletProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,7 +31,7 @@ export default function RootLayout({ children }) {
       className={`${geistSans.variable} ${geistMono.variable} ${cinzel.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background font-sans text-foreground antialiased">
-        {children}
+        <WalletProvider>{children}</WalletProvider>
       </body>
     </html>
   );

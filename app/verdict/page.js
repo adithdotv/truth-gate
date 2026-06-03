@@ -1,28 +1,16 @@
 import Navbar from "@/components/Navbar";
-import VerdictCard from "@/components/VerdictCard";
-import { evaluateSubmission } from "@/lib/mockEvaluation";
+import VerdictView from "@/components/VerdictView";
 
-// Verdict route — the gate's ruling.
-// TODO: replace evaluateSubmission() with the real Somnia Agent result
-// (looked up by submission id) instead of evaluating on each request.
+// Verdict route — reads the gate's onchain ruling for the given wallet.
 export default async function VerdictPage({ searchParams }) {
   const params = await searchParams;
-  const claim = params?.claim ?? "";
-  const github = params?.github ?? "";
-  const website = params?.website ?? "";
-
-  const verdict = evaluateSubmission({ idea: claim, github, website });
+  const address = params?.address ?? "";
 
   return (
     <>
       <Navbar />
       <main className="flex min-h-[100svh] flex-1 flex-col items-center justify-center px-6 py-20">
-        <VerdictCard
-          status={verdict.status}
-          score={verdict.score}
-          reasoning={verdict.reasoning}
-          claim={claim}
-        />
+        <VerdictView address={address} />
       </main>
     </>
   );

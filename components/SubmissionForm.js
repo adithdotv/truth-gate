@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 // Submission form — present your case to the gatekeeper.
-// TODO: wire onSubmit to the Somnia Agent pipeline and add real validation.
+// GitHub is the field the oracle actually analyzes; idea/website are context.
 const FIELD =
   "w-full rounded-xl border border-border bg-surface/60 px-4 py-3 text-base text-foreground placeholder:text-muted/60 outline-none transition-all duration-300 focus:border-gold/60 focus:bg-surface focus:shadow-[0_0_0_1px_rgba(244,217,123,0.25),0_0_22px_rgba(244,217,123,0.12)]";
 
@@ -14,8 +14,7 @@ export default function SubmissionForm({ onSubmit }) {
 
   function handleSubmit(event) {
     event.preventDefault();
-    if (!idea.trim()) return;
-    // TODO: replace with real submission logic.
+    if (!github.trim()) return;
     onSubmit?.({
       idea: idea.trim(),
       github: github.trim(),
@@ -41,7 +40,6 @@ export default function SubmissionForm({ onSubmit }) {
           value={idea}
           onChange={(event) => setIdea(event.target.value)}
           rows={5}
-          required
           placeholder="Describe the idea you bring before the gate…"
           className={`${FIELD} resize-none`}
         />
@@ -53,15 +51,16 @@ export default function SubmissionForm({ onSubmit }) {
           htmlFor="github"
           className="text-xs uppercase tracking-[0.2em] text-muted"
         >
-          GitHub URL
+          GitHub Username
         </label>
         <input
           id="github"
-          type="url"
-          inputMode="url"
+          type="text"
+          required
+          autoComplete="off"
           value={github}
           onChange={(event) => setGithub(event.target.value)}
-          placeholder="https://github.com/you/project"
+          placeholder="torvalds  ·  or https://github.com/torvalds"
           className={FIELD}
         />
       </div>
@@ -87,7 +86,7 @@ export default function SubmissionForm({ onSubmit }) {
 
       <button
         type="submit"
-        disabled={!idea.trim()}
+        disabled={!github.trim()}
         className="glow-gold mt-2 flex h-12 items-center justify-center rounded-full bg-surface-elevated font-display text-sm uppercase tracking-[0.2em] text-gold-bright transition-all hover:scale-[1.02] hover:bg-surface disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
       >
         Face the Gatekeeper
