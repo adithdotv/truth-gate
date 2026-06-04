@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import Reveal from "@/components/Reveal";
+import RichText from "@/components/RichText";
 import { getTrustTier, parseTechStack } from "@/lib/contract";
 
 // Cinematic verdict reveal — the gatekeeper's onchain ruling.
@@ -98,8 +99,10 @@ export default function VerdictCard({ reputation }) {
     bio = "",
     createdAt = "",
     portfolioUrl = "",
+    startupIdea = "",
     portfolioSummary = "",
     detectedTechStack = "",
+    aiVerdict = "",
     followers = 0,
     following = 0,
     publicRepos = 0,
@@ -248,29 +251,49 @@ export default function VerdictCard({ reputation }) {
         </div>
       </div>
 
-      {/* ════════ GITHUB METRICS ════════ */}
-      <Reveal as="section" className="panel flex flex-col gap-5 p-6 sm:p-8">
-        <SectionLabel accent={accent}>GitHub Metrics</SectionLabel>
-        <div className="flex items-stretch">
-          <Stat label="Followers" value={followers} />
-          <div className="w-px bg-border" />
-          <Stat label="Following" value={following} />
-          <div className="w-px bg-border" />
-          <Stat label="Repos" value={publicRepos} />
-        </div>
-        {bio && <p className="text-sm leading-relaxed text-muted">{bio}</p>}
-        {createdAt && (
-          <p className="text-xs uppercase tracking-[0.2em] text-muted/70">
-            On GitHub since {createdAt}
-          </p>
+      {/* ════════ AI FOUNDER VERDICT ════════ */}
+      <Reveal as="section" className="panel flex flex-col gap-4 p-6 sm:p-8">
+        <SectionLabel accent={accent}>AI Founder Verdict</SectionLabel>
+        <h3 className="font-display text-xl text-glow-gold sm:text-2xl">
+          TruthGate AI Verdict
+        </h3>
+        {aiVerdict ? (
+          <div className="relative">
+            <span
+              aria-hidden
+              className="absolute left-0 top-0 h-full w-px rounded"
+              style={{ background: `rgb(${accent} / 0.5)` }}
+            />
+            <RichText
+              text={aiVerdict}
+              className="pl-5 text-base text-foreground/90"
+            />
+          </div>
+        ) : (
+          <p className="text-sm italic text-muted">No AI verdict generated</p>
         )}
       </Reveal>
 
-      {/* ════════ AI REPUTATION ANALYSIS ════════ */}
+      {/* ════════ STARTUP VISION ════════ */}
       <Reveal as="section" className="panel flex flex-col gap-4 p-6 sm:p-8">
-        <SectionLabel accent={accent}>AI Reputation Analysis</SectionLabel>
+        <SectionLabel accent={accent}>Startup Idea</SectionLabel>
         <h3 className="font-display text-xl text-glow-gold sm:text-2xl">
-          Gatekeeper Reasoning
+          Startup Vision
+        </h3>
+        {startupIdea ? (
+          <p className="whitespace-pre-wrap text-base leading-relaxed text-foreground/90">
+            {startupIdea}
+          </p>
+        ) : (
+          <p className="text-sm italic text-muted">No startup idea available</p>
+        )}
+      </Reveal>
+
+      {/* ════════ PORTFOLIO SUMMARY ════════ */}
+      <Reveal as="section" className="panel flex flex-col gap-4 p-6 sm:p-8">
+        <SectionLabel accent={accent}>Portfolio Intelligence</SectionLabel>
+        <h3 className="font-display text-xl text-glow-gold sm:text-2xl">
+          Portfolio Summary
         </h3>
         {portfolioSummary ? (
           <div className="relative">
@@ -279,13 +302,14 @@ export default function VerdictCard({ reputation }) {
               className="absolute left-0 top-0 h-full w-px rounded"
               style={{ background: `rgb(${accent} / 0.5)` }}
             />
-            <p className="pl-5 text-base leading-relaxed text-foreground/90">
-              {portfolioSummary}
-            </p>
+            <RichText
+              text={portfolioSummary}
+              className="pl-5 text-base text-foreground/90"
+            />
           </div>
         ) : (
           <p className="text-sm italic text-muted">
-            The Gatekeeper could not parse a portfolio summary for this builder.
+            No portfolio summary available
           </p>
         )}
         {portfolioUrl && (
@@ -327,6 +351,24 @@ export default function VerdictCard({ reputation }) {
         ) : (
           <p className="text-sm italic text-muted">
             No technical signals were detected from the portfolio.
+          </p>
+        )}
+      </Reveal>
+
+      {/* ════════ GITHUB METRICS ════════ */}
+      <Reveal as="section" className="panel flex flex-col gap-5 p-6 sm:p-8">
+        <SectionLabel accent={accent}>GitHub Metrics</SectionLabel>
+        <div className="flex items-stretch">
+          <Stat label="Followers" value={followers} />
+          <div className="w-px bg-border" />
+          <Stat label="Following" value={following} />
+          <div className="w-px bg-border" />
+          <Stat label="Repositories" value={publicRepos} />
+        </div>
+        {bio && <p className="text-sm leading-relaxed text-muted">{bio}</p>}
+        {createdAt && (
+          <p className="text-xs uppercase tracking-[0.2em] text-muted/70">
+            On GitHub since {createdAt}
           </p>
         )}
       </Reveal>

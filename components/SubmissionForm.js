@@ -18,6 +18,9 @@ export default function SubmissionForm({ onSubmit }) {
 
   function validate() {
     const next = {};
+    if (!idea.trim()) {
+      next.idea = "Describe your startup idea before facing the gate.";
+    }
     if (!github.trim()) {
       next.github = "Enter a GitHub username or profile URL.";
     }
@@ -48,22 +51,29 @@ export default function SubmissionForm({ onSubmit }) {
       noValidate
       className="panel mx-auto flex w-full max-w-xl flex-col gap-6 p-6 sm:p-8"
     >
-      {/* Startup Idea (optional context) */}
+      {/* Startup Idea */}
       <div className="flex flex-col gap-2">
         <label
           htmlFor="idea"
           className="text-xs uppercase tracking-[0.2em] text-muted"
         >
-          Startup Idea <span className="text-muted/50">· optional</span>
+          Startup Idea
         </label>
         <textarea
           id="idea"
           value={idea}
-          onChange={(event) => setIdea(event.target.value)}
+          onChange={(event) => {
+            setIdea(event.target.value);
+            if (errors.idea) setErrors((e) => ({ ...e, idea: undefined }));
+          }}
           rows={4}
-          placeholder="Describe the idea you bring before the gate…"
-          className={`${FIELD} resize-none`}
+          placeholder="Describe your startup idea in a few sentences..."
+          aria-invalid={!!errors.idea}
+          className={`${FIELD} resize-none ${errors.idea ? FIELD_ERROR : ""}`}
         />
+        {errors.idea && (
+          <span className="text-xs text-[rgb(248_113_113)]">{errors.idea}</span>
+        )}
       </div>
 
       {/* GitHub Username */}
@@ -124,7 +134,7 @@ export default function SubmissionForm({ onSubmit }) {
 
       <button
         type="submit"
-        disabled={!github.trim() || !website.trim()}
+        disabled={!idea.trim() || !github.trim() || !website.trim()}
         className="glow-gold mt-2 flex h-12 items-center justify-center rounded-full bg-surface-elevated font-display text-sm uppercase tracking-[0.2em] text-gold-bright transition-all hover:scale-[1.02] hover:bg-surface disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
       >
         Face the Gatekeeper

@@ -61,7 +61,7 @@ export default function SubmitPage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState(null);
 
-  async function runFlow(githubInput, portfolioUrl) {
+  async function runFlow(githubInput, portfolioUrl, startupIdea) {
     const username = parseGithubUsername(githubInput);
     if (!username) {
       setError("Enter a valid GitHub username or profile URL.");
@@ -70,6 +70,11 @@ export default function SubmitPage() {
     }
     if (!/^https:\/\//i.test(portfolioUrl ?? "")) {
       setError("A valid portfolio URL (https://) is required.");
+      setPhase("error");
+      return;
+    }
+    if (!startupIdea?.trim()) {
+      setError("A startup idea is required for the founder evaluation.");
       setPhase("error");
       return;
     }
@@ -100,6 +105,7 @@ export default function SubmitPage() {
         signer,
         username,
         portfolioUrl,
+        startupIdea,
         onStep: (s) => setMessage(s.message),
       });
 
@@ -160,7 +166,9 @@ export default function SubmitPage() {
               </p>
             </header>
             <SubmissionForm
-              onSubmit={({ github, website }) => runFlow(github, website)}
+              onSubmit={({ github, website, idea }) =>
+                runFlow(github, website, idea)
+              }
             />
           </>
         )}
