@@ -16,6 +16,7 @@ import {
   isCorrectNetwork,
   onAccountsChanged,
   onChainChanged,
+  revokeWalletPermissions,
   switchToSomnia,
   WalletError,
 } from "@/lib/wallet";
@@ -81,6 +82,12 @@ export default function WalletProvider({ children }) {
     }
   }, []);
 
+  const disconnect = useCallback(async () => {
+    await revokeWalletPermissions();
+    setAddress(null);
+    setError(null);
+  }, []);
+
   const switchNetwork = useCallback(async () => {
     setError(null);
     try {
@@ -99,6 +106,7 @@ export default function WalletProvider({ children }) {
     isConnected: !!address,
     isCorrectNetwork: isCorrectNetwork(chainId),
     connect,
+    disconnect,
     switchNetwork,
     clearError: () => setError(null),
   };

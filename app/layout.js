@@ -1,4 +1,5 @@
 import { Geist, Geist_Mono, Cinzel } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import WalletProvider from "@/components/WalletProvider";
 import { SITE_URL } from "@/lib/share";
@@ -35,6 +36,7 @@ export default function RootLayout({ children }) {
     >
       <body className="min-h-full flex flex-col bg-background font-sans text-foreground antialiased">
         <WalletProvider>{children}</WalletProvider>
+        <Analytics />
       </body>
     </html>
   );

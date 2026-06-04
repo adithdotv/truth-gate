@@ -1,13 +1,23 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useWallet } from "@/components/WalletProvider";
 import { shortenAddress } from "@/lib/wallet";
 
 // Minimal transparent navbar for TruthGate.
 export default function Navbar() {
-  const { isConnected, isCorrectNetwork, address, connecting, connect, switchNetwork } =
-    useWallet();
+  const {
+    isConnected,
+    isCorrectNetwork,
+    address,
+    connecting,
+    connect,
+    disconnect,
+    switchNetwork,
+  } = useWallet();
+
+  const [menuOpen, setMenuOpen] = useState(false);
 
   function renderWalletButton() {
     if (isConnected && !isCorrectNetwork) {
@@ -24,9 +34,41 @@ export default function Navbar() {
 
     if (isConnected) {
       return (
-        <span className="flex h-9 items-center rounded-full border border-emerald/40 bg-emerald/5 px-4 font-mono text-sm tracking-wide text-emerald-bright">
-          {shortenAddress(address)}
-        </span>
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setMenuOpen((o) => !o)}
+            className="flex h-9 items-center gap-2 rounded-full border border-emerald/40 bg-emerald/5 px-4 font-mono text-sm tracking-wide text-emerald-bright transition-all hover:border-emerald hover:bg-emerald/10"
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-bright shadow-[0_0_8px_rgba(52,227,168,0.8)]" />
+            {shortenAddress(address)}
+          </button>
+
+          {menuOpen && (
+            <>
+              {/* click-away backdrop */}
+              <button
+                type="button"
+                aria-hidden
+                tabIndex={-1}
+                onClick={() => setMenuOpen(false)}
+                className="fixed inset-0 z-40 cursor-default"
+              />
+              <div className="panel absolute right-0 top-11 z-50 flex w-44 flex-col p-1.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    disconnect();
+                  }}
+                  className="flex h-9 items-center rounded-lg px-3 text-sm tracking-wide text-foreground transition-colors hover:bg-[rgb(248_113_113_/_0.1)] hover:text-[rgb(248_113_113)]"
+                >
+                  Disconnect
+                </button>
+              </div>
+            </>
+          )}
+        </div>
       );
     }
 
