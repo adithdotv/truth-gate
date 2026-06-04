@@ -93,7 +93,7 @@ function SectionLabel({ accent, children }) {
   );
 }
 
-export default function VerdictCard({ reputation }) {
+export default function VerdictCard({ reputation, address = "" }) {
   const {
     username = "",
     bio = "",
@@ -248,6 +248,18 @@ export default function VerdictCard({ reputation }) {
             </span>
             <p className="mt-1 max-w-xs text-sm text-muted">{TIER_BLURB[tier]}</p>
           </div>
+
+          {/* Primary action — surfaced up top so it isn't buried below the scroll */}
+          {address && (
+            <Link
+              href={`/passport/${address}`}
+              className="pulse-glow animate-fade-in-up mt-2 flex h-12 items-center justify-center gap-2 rounded-full bg-surface-elevated px-9 font-display text-sm uppercase tracking-[0.2em] text-gold-bright transition-all hover:scale-[1.03] hover:bg-surface"
+              style={{ animationDelay: "0.65s" }}
+            >
+              Generate Passport
+              <span aria-hidden>→</span>
+            </Link>
+          )}
         </div>
       </div>
 
@@ -381,6 +393,15 @@ export default function VerdictCard({ reputation }) {
           <span style={{ color: `rgb(${accent})` }}>{label}</span>, recorded
           onchain.
         </p>
+        {address && (
+          <Link
+            href={`/passport/${address}`}
+            className="pulse-glow flex h-14 items-center justify-center gap-2 rounded-full bg-surface-elevated px-10 font-display text-base uppercase tracking-[0.2em] text-gold-bright transition-all hover:scale-[1.03] hover:bg-surface"
+          >
+            Generate Passport
+            <span aria-hidden>→</span>
+          </Link>
+        )}
         <div className="flex flex-col gap-3 sm:flex-row">
           <Link
             href="/submit"
@@ -390,7 +411,7 @@ export default function VerdictCard({ reputation }) {
           </Link>
           <Link
             href="/"
-            className="glow-gold flex h-12 items-center justify-center rounded-full bg-surface-elevated px-8 font-display text-sm uppercase tracking-[0.2em] text-gold-bright transition-all hover:scale-[1.03] hover:bg-surface"
+            className="flex h-12 items-center justify-center rounded-full border border-border px-8 font-display text-sm uppercase tracking-[0.2em] text-foreground transition-all hover:border-gold/50 hover:text-glow-gold"
           >
             Return Home
           </Link>
