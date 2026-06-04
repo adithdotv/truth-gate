@@ -1,10 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 import Reveal from "@/components/Reveal";
 import RichText from "@/components/RichText";
+import FounderPassport from "@/components/FounderPassport";
 import { getTrustTier, parseTechStack } from "@/lib/contract";
+import {
+  downloadPassport,
+  shareToTwitter,
+  copyVerdictLink,
+  SITE_URL,
+} from "@/lib/share";
 
 // Cinematic verdict reveal — the gatekeeper's onchain ruling.
 // Styling adapts to the trust tier:
@@ -141,6 +149,33 @@ export default function VerdictCard({ reputation, address = "" }) {
 
   const offset = drawn ? CIRC * (1 - Math.min(truthScore, 100) / 100) : CIRC;
 
+  // Founder Passport sharing
+  const passportRef = useRef(null);
+  async function handleDownload() {
+    try {
+      await downloadPassport(passportRef.current, username);
+      toast.success("Passport downloaded");
+    } catch {
+      toast.error("Couldn't export the passport");
+    }
+  }
+  function handleShareX() {
+    shareToTwitter({
+      score: truthScore,
+      tier: label,
+      startupIdea,
+      url: address ? `${SITE_URL}/passport/${address}` : SITE_URL,
+    });
+  }
+  async function handleCopy() {
+    try {
+      await copyVerdictLink();
+      toast.success("Verdict link copied");
+    } catch {
+      toast.error("Couldn't copy the link");
+    }
+  }
+
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
       {/* ════════ TRUTH SCORE HERO ════════ */}
@@ -262,6 +297,45 @@ export default function VerdictCard({ reputation, address = "" }) {
           )}
         </div>
       </div>
+
+      {/* ════════ SHAREABLE FOUNDER PASSPORT ════════ */}
+      <Reveal as="section" className="flex flex-col items-center gap-5">
+        <SectionLabel accent={accent}>Founder Passport</SectionLabel>
+        {/* ref is on the card itself (always opaque) so image export is clean */}
+        <FounderPassport
+          ref={passportRef}
+          username={username}
+          truthScore={truthScore}
+          trustTier={label}
+          startupIdea={startupIdea}
+          aiVerdict={aiVerdict}
+        />
+
+        {/* Action bar — horizontal on desktop, stacked on mobile */}
+        <div className="flex w-full max-w-[400px] flex-col gap-3 sm:flex-row">
+          <button
+            type="button"
+            onClick={handleDownload}
+            className="glow-gold flex h-11 flex-1 items-center justify-center rounded-full bg-surface-elevated px-5 font-display text-xs uppercase tracking-[0.2em] text-gold-bright transition-all hover:scale-[1.03] hover:bg-surface"
+          >
+            Download Passport
+          </button>
+          <button
+            type="button"
+            onClick={handleShareX}
+            className="flex h-11 flex-1 items-center justify-center rounded-full border border-border px-5 font-display text-xs uppercase tracking-[0.2em] text-foreground transition-all hover:border-emerald/50 hover:text-glow-emerald"
+          >
+            Share on X
+          </button>
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="flex h-11 flex-1 items-center justify-center rounded-full border border-border px-5 font-display text-xs uppercase tracking-[0.2em] text-foreground transition-all hover:border-gold/50 hover:text-glow-gold"
+          >
+            Copy Link
+          </button>
+        </div>
+      </Reveal>
 
       {/* ════════ AI FOUNDER VERDICT ════════ */}
       <Reveal as="section" className="panel flex flex-col gap-4 p-6 sm:p-8">

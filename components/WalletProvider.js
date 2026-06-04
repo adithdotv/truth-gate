@@ -7,6 +7,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { Toaster } from "react-hot-toast";
 import {
   connectWallet,
   getAccount,
@@ -103,6 +104,21 @@ export default function WalletProvider({ children }) {
   };
 
   return (
-    <WalletContext.Provider value={value}>{children}</WalletContext.Provider>
+    <WalletContext.Provider value={value}>
+      <Toaster
+        position="bottom-center"
+        toastOptions={{
+          style: {
+            background: "#121517",
+            color: "#eceae3",
+            border: "1px solid #2a2519",
+            fontSize: "0.85rem",
+          },
+          success: { iconTheme: { primary: "#34e3a8", secondary: "#0b0d0e" } },
+          error: { iconTheme: { primary: "#f87171", secondary: "#0b0d0e" } },
+        }}
+      />
+      {children}
+    </WalletContext.Provider>
   );
 }

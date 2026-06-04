@@ -1,11 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import QRCode from "react-qr-code";
+import toast from "react-hot-toast";
 import Reveal from "@/components/Reveal";
 import RichText from "@/components/RichText";
+import FounderPassport from "@/components/FounderPassport";
 import { getTrustTier, parseTechStack } from "@/lib/contract";
 import { shortenAddress } from "@/lib/wallet";
+import { downloadPassport, shareToTwitter, SITE_URL } from "@/lib/share";
 
 // The Founder Passport — TruthGate's shareable, onchain-verified identity card.
 const TIER_ACCENT = {
@@ -131,7 +134,7 @@ export default function PassportCard({ reputation, address = "" }) {
 
   // Passport metadata
   const passportId = `TG-${address.slice(2, 8).toUpperCase() || "000000"}-${truthScore}`;
-  const shareUrl = `https://truth-gate-opal.vercel.app/passport/${address}`;
+  const shareUrl = `${SITE_URL}/passport/${address}`;
 
   // Client-only component (rendered after the fetch), so a lazy initializer
   // is safe and avoids an effect just to stamp the issue date.
@@ -164,6 +167,20 @@ export default function PassportCard({ reputation, address = "" }) {
     } else {
       copyLink();
     }
+  }
+
+  // Export the compact credential (rendered off-screen) as a PNG.
+  const exportRef = useRef(null);
+  async function handleDownload() {
+    try {
+      await downloadPassport(exportRef.current, username);
+      toast.success("Passport downloaded");
+    } catch {
+      toast.error("Couldn't export the passport");
+    }
+  }
+  function handleShareX() {
+    shareToTwitter({ score: truthScore, tier: label, startupIdea, url: shareUrl });
   }
 
   // Frontend-generated score breakdown (visual explanation only).
@@ -388,7 +405,21 @@ export default function PassportCard({ reputation, address = "" }) {
           Scan to verify founder passport
         </span>
 
-        <div className="flex w-full flex-col gap-3 sm:flex-row sm:justify-center">
+        <div className="flex w-full flex-wrap justify-center gap-3">
+          <button
+            type="button"
+            onClick={handleDownload}
+            className="glow-gold flex h-11 items-center justify-center rounded-full bg-surface-elevated px-6 font-display text-sm uppercase tracking-[0.2em] text-gold-bright transition-all hover:scale-[1.03] hover:bg-surface"
+          >
+            Download Passport
+          </button>
+          <button
+            type="button"
+            onClick={handleShareX}
+            className="flex h-11 items-center justify-center rounded-full border border-border px-6 font-display text-sm uppercase tracking-[0.2em] text-foreground transition-all hover:border-emerald/50 hover:text-glow-emerald"
+          >
+            Share on X
+          </button>
           <button
             type="button"
             onClick={copyLink}
@@ -399,7 +430,7 @@ export default function PassportCard({ reputation, address = "" }) {
           <button
             type="button"
             onClick={sharePassport}
-            className="glow-gold flex h-11 items-center justify-center rounded-full bg-surface-elevated px-6 font-display text-sm uppercase tracking-[0.2em] text-gold-bright transition-all hover:scale-[1.03] hover:bg-surface"
+            className="flex h-11 items-center justify-center rounded-full border border-border px-6 font-display text-sm uppercase tracking-[0.2em] text-foreground transition-all hover:border-gold/50 hover:text-glow-gold"
           >
             Share Passport
           </button>
@@ -418,6 +449,27 @@ export default function PassportCard({ reputation, address = "" }) {
           <span className="text-glow-emerald">Somnia</span>
         </span>
       </Reveal>
+
+      {/* Off-screen compact credential — captured for the PNG export */}
+      <div
+        aria-hidden
+        style={{
+          position: "fixed",
+          left: "-9999px",
+          top: 0,
+          width: "400px",
+          pointerEvents: "none",
+        }}
+      >
+        <FounderPassport
+          ref={exportRef}
+          username={username}
+          truthScore={truthScore}
+          trustTier={label}
+          startupIdea={startupIdea}
+          aiVerdict={aiVerdict}
+        />
+      </div>
     </div>
   );
 }

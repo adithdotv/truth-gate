@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono, Cinzel } from "next/font/google";
 import "./globals.css";
 import WalletProvider from "@/components/WalletProvider";
+import { SITE_URL } from "@/lib/share";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,8 +21,10 @@ const cinzel = Cinzel({
 });
 
 export const metadata = {
-  title: "Truth Gate",
-  description: "Submit your claim. Let the oracle render its verdict.",
+  metadataBase: new URL(SITE_URL),
+  title: "TruthGate",
+  description:
+    "An autonomous AI gatekeeper on Somnia. Earn your onchain Founder Passport.",
 };
 
 export default function RootLayout({ children }) {
