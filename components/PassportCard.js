@@ -57,7 +57,7 @@ function SectionLabel({ accent, children }) {
 function StatCard({ label, value, accent }) {
   const v = useCountUp(value, 1200);
   return (
-    <div className="panel flex flex-1 flex-col items-center gap-1 p-5 transition-all duration-300 hover:-translate-y-1">
+    <div className="flex flex-1 flex-col items-center gap-1 rounded-xl border border-border bg-surface/40 p-4 transition-all duration-300 hover:-translate-y-1">
       <span
         className="font-display text-3xl"
         style={{
@@ -193,7 +193,7 @@ export default function PassportCard({ reputation, address = "" }) {
   ];
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
       {/* glow burst */}
       <div className="relative">
         <div
@@ -256,8 +256,10 @@ export default function PassportCard({ reputation, address = "" }) {
         </div>
       </div>
 
-      {/* ════════ TRUTH SCORE + SEAL ════════ */}
-      <div className="panel flex flex-col items-center gap-6 p-6 text-center sm:p-8">
+      {/* ════════ SCORE + VERDICT ROW ════════ */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Truth Score + Seal */}
+        <div className="panel flex h-full flex-col items-center justify-center gap-6 p-6 text-center sm:p-8 lg:col-span-1">
         <div className="animate-fade-in-up relative h-44 w-44">
           <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90">
             <defs>
@@ -310,8 +312,8 @@ export default function PassportCard({ reputation, address = "" }) {
         </div>
       </div>
 
-      {/* ════════ ORACLE VERDICT (centerpiece) ════════ */}
-      <Reveal as="section" className="panel flex flex-col gap-4 p-6 sm:p-8">
+        {/* Oracle Verdict (centerpiece) */}
+        <Reveal as="section" className="panel flex h-full flex-col gap-4 p-6 sm:p-8 lg:col-span-2">
         <SectionLabel accent={accent}>Oracle Verdict</SectionLabel>
         {aiVerdict ? (
           <div className="relative">
@@ -325,11 +327,14 @@ export default function PassportCard({ reputation, address = "" }) {
         ) : (
           <p className="text-sm italic text-muted">No AI verdict generated</p>
         )}
-      </Reveal>
+        </Reveal>
+      </div>
 
-      {/* ════════ STARTUP VISION ════════ */}
-      <Reveal as="section" className="panel flex flex-col gap-3 p-6 sm:p-8">
-        <SectionLabel accent={accent}>Startup Vision</SectionLabel>
+      {/* ════════ STARTUP + PORTFOLIO ROW ════════ */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Startup Vision */}
+        <Reveal as="section" className="panel flex h-full flex-col gap-3 p-6 sm:p-8">
+          <SectionLabel accent={accent}>Startup Vision</SectionLabel>
         {startupIdea ? (
           <p className="whitespace-pre-wrap text-base leading-relaxed text-foreground/90">
             {startupIdea}
@@ -339,17 +344,18 @@ export default function PassportCard({ reputation, address = "" }) {
         )}
       </Reveal>
 
-      {/* ════════ PORTFOLIO ANALYSIS ════════ */}
-      <Reveal as="section" className="panel flex flex-col gap-3 p-6 sm:p-8">
-        <SectionLabel accent={accent}>Portfolio Analysis</SectionLabel>
-        {portfolioSummary ? (
-          <RichText text={portfolioSummary} className="text-base text-foreground/90" />
-        ) : (
-          <p className="text-sm italic text-muted">No portfolio summary available</p>
-        )}
-      </Reveal>
+        {/* Portfolio Analysis */}
+        <Reveal as="section" className="panel flex h-full flex-col gap-3 p-6 sm:p-8">
+          <SectionLabel accent={accent}>Portfolio Analysis</SectionLabel>
+          {portfolioSummary ? (
+            <RichText text={portfolioSummary} className="text-base text-foreground/90" />
+          ) : (
+            <p className="text-sm italic text-muted">No portfolio summary available</p>
+          )}
+        </Reveal>
+      </div>
 
-      {/* ════════ DETECTED STACK ════════ */}
+      {/* ════════ DETECTED STACK (full width) ════════ */}
       <Reveal as="section" className="panel flex flex-col gap-4 p-6 sm:p-8">
         <SectionLabel accent={accent}>Detected Stack</SectionLabel>
         {tech.length > 0 ? (
@@ -369,9 +375,11 @@ export default function PassportCard({ reputation, address = "" }) {
         )}
       </Reveal>
 
-      {/* ════════ GITHUB METRICS ════════ */}
-      <Reveal as="section" className="flex flex-col gap-4">
-        <SectionLabel accent={accent}>GitHub Metrics</SectionLabel>
+      {/* ════════ METRICS + BREAKDOWN ROW ════════ */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* GitHub Metrics */}
+        <Reveal as="section" className="panel flex h-full flex-col gap-4 p-6 sm:p-8">
+          <SectionLabel accent={accent}>GitHub Metrics</SectionLabel>
         <div className="flex gap-4">
           <StatCard label="Followers" value={followers} accent={accent} />
           <StatCard label="Following" value={following} accent={accent} />
@@ -382,20 +390,21 @@ export default function PassportCard({ reputation, address = "" }) {
         )}
       </Reveal>
 
-      {/* ════════ SCORE BREAKDOWN ════════ */}
-      <Reveal as="section" className="panel flex flex-col gap-5 p-6 sm:p-8">
-        <SectionLabel accent={accent}>Score Breakdown</SectionLabel>
-        <div className="flex flex-col gap-5">
-          {breakdown.map((b) => (
-            <BreakdownBar key={b.label} {...b} accent={accent} />
-          ))}
-        </div>
-        <p className="text-[0.65rem] italic text-muted/60">
-          Breakdown is an illustrative weighting of the onchain signals.
-        </p>
-      </Reveal>
+        {/* Score Breakdown */}
+        <Reveal as="section" className="panel flex h-full flex-col gap-5 p-6 sm:p-8">
+          <SectionLabel accent={accent}>Score Breakdown</SectionLabel>
+          <div className="flex flex-col gap-5">
+            {breakdown.map((b) => (
+              <BreakdownBar key={b.label} {...b} accent={accent} />
+            ))}
+          </div>
+          <p className="text-[0.65rem] italic text-muted/60">
+            Breakdown is an illustrative weighting of the onchain signals.
+          </p>
+        </Reveal>
+      </div>
 
-      {/* ════════ QR + SHARE ════════ */}
+      {/* ════════ QR + SHARE (full width) ════════ */}
       <Reveal as="section" className="panel flex flex-col items-center gap-5 p-6 text-center sm:p-8">
         <SectionLabel accent={accent}>Verify This Passport</SectionLabel>
         <div className="rounded-2xl bg-white p-4 shadow-[0_0_24px_rgba(244,217,123,0.2)]">

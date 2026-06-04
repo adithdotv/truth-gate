@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 import Reveal from "@/components/Reveal";
 import RichText from "@/components/RichText";
 import FounderPassport from "@/components/FounderPassport";
-import { getTrustTier, parseTechStack } from "@/lib/contract";
+import { getTrustTier } from "@/lib/contract";
 import {
   downloadPassport,
   shareToTwitter,
@@ -15,8 +15,8 @@ import {
 } from "@/lib/share";
 
 // Cinematic verdict reveal — the gatekeeper's onchain ruling.
-// Styling adapts to the trust tier:
-//   verified → emerald · moderate → gold · low → rose-red
+// Focused on the judgment (score + AI verdict) and the shareable passport;
+// the full breakdown lives on /passport/[address].
 const TIER_ACCENT = {
   verified: "52 227 168", // emerald
   moderate: "244 217 123", // gold
@@ -29,44 +29,6 @@ const TIER_BLURB = {
   low: "Insufficient signal to vouch for this builder yet.",
 };
 
-// Categorize comma-separated tech tokens into sensible buckets.
-const TECH_BUCKETS = [
-  {
-    category: "Frontend",
-    match: ["react", "next", "vue", "angular", "svelte", "tailwind", "css", "html", "javascript", "typescript", "redux", "vite", "webpack", "sass", "bootstrap", "remix"],
-  },
-  {
-    category: "Backend",
-    match: ["node", "express", "django", "flask", "rails", "spring", "fastapi", "graphql", "postgres", "mysql", "mongo", "redis", "python", "java", "golang", "go", "rust", "php", "ruby", "laravel", ".net", "c#", "nest", "prisma", "sql", "supabase", "firebase"],
-  },
-  {
-    category: "Web3",
-    match: ["solidity", "ethers", "web3", "hardhat", "foundry", "wagmi", "viem", "ethereum", "somnia", "evm", "smart contract", "blockchain", "truffle", "ipfs", "chainlink"],
-  },
-  {
-    category: "Tools",
-    match: ["docker", "kubernetes", "k8s", "git", "github", "gitlab", "aws", "gcp", "azure", "vercel", "netlify", "jest", "cypress", "figma", "linux", "nginx", "ci"],
-  },
-];
-
-function categorizeTech(tokens) {
-  const groups = new Map();
-  for (const token of tokens) {
-    const lower = token.toLowerCase();
-    const bucket = TECH_BUCKETS.find((b) =>
-      b.match.some((m) => lower.includes(m) || m.includes(lower)),
-    );
-    const key = bucket ? bucket.category : "Other";
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key).push(token);
-  }
-  // Stable order: known buckets first, then Other.
-  const order = [...TECH_BUCKETS.map((b) => b.category), "Other"];
-  return order
-    .filter((c) => groups.has(c))
-    .map((category) => ({ category, items: groups.get(category) }));
-}
-
 function TierIcon({ tier }) {
   if (tier === "verified") {
     return <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />;
@@ -75,19 +37,6 @@ function TierIcon({ tier }) {
     return <path d="M7 7l10 10M17 7L7 17" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />;
   }
   return <path d="M6 12h12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />;
-}
-
-function Stat({ label, value }) {
-  return (
-    <div className="flex flex-1 flex-col items-center gap-1">
-      <span className="font-display text-2xl text-foreground sm:text-3xl">
-        {value}
-      </span>
-      <span className="text-[0.6rem] uppercase tracking-[0.25em] text-muted">
-        {label}
-      </span>
-    </div>
-  );
 }
 
 function SectionLabel({ accent, children }) {
@@ -104,22 +53,13 @@ function SectionLabel({ accent, children }) {
 export default function VerdictCard({ reputation, address = "" }) {
   const {
     username = "",
-    bio = "",
-    createdAt = "",
-    portfolioUrl = "",
     startupIdea = "",
-    portfolioSummary = "",
-    detectedTechStack = "",
     aiVerdict = "",
-    followers = 0,
-    following = 0,
-    publicRepos = 0,
     truthScore = 0,
   } = reputation ?? {};
 
   const { tier, label } = getTrustTier(truthScore);
   const accent = TIER_ACCENT[tier];
-  const techGroups = categorizeTech(parseTechStack(detectedTechStack));
 
   // Ring geometry
   const R = 54;
@@ -177,8 +117,8 @@ export default function VerdictCard({ reputation, address = "" }) {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
-      {/* ════════ TRUTH SCORE HERO ════════ */}
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+      {/* ════════ TRUTH SCORE HERO (full width) ════════ */}
       <div className="relative">
         <div
           aria-hidden
@@ -283,183 +223,78 @@ export default function VerdictCard({ reputation, address = "" }) {
             </span>
             <p className="mt-1 max-w-xs text-sm text-muted">{TIER_BLURB[tier]}</p>
           </div>
-
-          {/* Primary action — surfaced up top so it isn't buried below the scroll */}
-          {address && (
-            <Link
-              href={`/passport/${address}`}
-              className="pulse-glow animate-fade-in-up mt-2 flex h-12 items-center justify-center gap-2 rounded-full bg-surface-elevated px-9 font-display text-sm uppercase tracking-[0.2em] text-gold-bright transition-all hover:scale-[1.03] hover:bg-surface"
-              style={{ animationDelay: "0.65s" }}
-            >
-              Generate Passport
-              <span aria-hidden>→</span>
-            </Link>
-          )}
         </div>
       </div>
 
-      {/* ════════ SHAREABLE FOUNDER PASSPORT ════════ */}
-      <Reveal as="section" className="flex flex-col items-center gap-5">
-        <SectionLabel accent={accent}>Founder Passport</SectionLabel>
-        {/* ref is on the card itself (always opaque) so image export is clean */}
-        <FounderPassport
-          ref={passportRef}
-          username={username}
-          truthScore={truthScore}
-          trustTier={label}
-          startupIdea={startupIdea}
-          aiVerdict={aiVerdict}
-        />
+      {/* ════════ VERDICT + PASSPORT ROW ════════ */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* AI Founder Verdict */}
+        <Reveal as="section" className="panel flex h-full flex-col gap-4 p-6 sm:p-8">
+          <SectionLabel accent={accent}>AI Founder Verdict</SectionLabel>
+          <h3 className="font-display text-xl text-glow-gold sm:text-2xl">
+            TruthGate AI Verdict
+          </h3>
+          {aiVerdict ? (
+            <div className="relative">
+              <span
+                aria-hidden
+                className="absolute left-0 top-0 h-full w-px rounded"
+                style={{ background: `rgb(${accent} / 0.5)` }}
+              />
+              <RichText
+                text={aiVerdict}
+                className="pl-5 text-base text-foreground/90"
+              />
+            </div>
+          ) : (
+            <p className="text-sm italic text-muted">No AI verdict generated</p>
+          )}
+        </Reveal>
 
-        {/* Action bar — horizontal on desktop, stacked on mobile */}
-        <div className="flex w-full max-w-[400px] flex-col gap-3 sm:flex-row">
-          <button
-            type="button"
-            onClick={handleDownload}
-            className="glow-gold flex h-11 flex-1 items-center justify-center rounded-full bg-surface-elevated px-5 font-display text-xs uppercase tracking-[0.2em] text-gold-bright transition-all hover:scale-[1.03] hover:bg-surface"
-          >
-            Download Passport
-          </button>
-          <button
-            type="button"
-            onClick={handleShareX}
-            className="flex h-11 flex-1 items-center justify-center rounded-full border border-border px-5 font-display text-xs uppercase tracking-[0.2em] text-foreground transition-all hover:border-emerald/50 hover:text-glow-emerald"
-          >
-            Share on X
-          </button>
-          <button
-            type="button"
-            onClick={handleCopy}
-            className="flex h-11 flex-1 items-center justify-center rounded-full border border-border px-5 font-display text-xs uppercase tracking-[0.2em] text-foreground transition-all hover:border-gold/50 hover:text-glow-gold"
-          >
-            Copy Link
-          </button>
-        </div>
-      </Reveal>
+        {/* Shareable Founder Passport */}
+        <Reveal
+          as="section"
+          className="panel flex h-full flex-col items-center gap-5 p-6 sm:p-8"
+        >
+          <SectionLabel accent={accent}>Founder Passport</SectionLabel>
+          {/* ref is on the card itself (always opaque) so image export is clean */}
+          <FounderPassport
+            ref={passportRef}
+            username={username}
+            truthScore={truthScore}
+            trustTier={label}
+            startupIdea={startupIdea}
+            aiVerdict={aiVerdict}
+          />
 
-      {/* ════════ AI FOUNDER VERDICT ════════ */}
-      <Reveal as="section" className="panel flex flex-col gap-4 p-6 sm:p-8">
-        <SectionLabel accent={accent}>AI Founder Verdict</SectionLabel>
-        <h3 className="font-display text-xl text-glow-gold sm:text-2xl">
-          TruthGate AI Verdict
-        </h3>
-        {aiVerdict ? (
-          <div className="relative">
-            <span
-              aria-hidden
-              className="absolute left-0 top-0 h-full w-px rounded"
-              style={{ background: `rgb(${accent} / 0.5)` }}
-            />
-            <RichText
-              text={aiVerdict}
-              className="pl-5 text-base text-foreground/90"
-            />
+          {/* Action bar — horizontal on desktop, stacked on mobile */}
+          <div className="flex w-full max-w-[400px] flex-col gap-3 sm:flex-row">
+            <button
+              type="button"
+              onClick={handleDownload}
+              className="glow-gold flex h-11 flex-1 items-center justify-center rounded-full bg-surface-elevated px-5 font-display text-xs uppercase tracking-[0.2em] text-gold-bright transition-all hover:scale-[1.03] hover:bg-surface"
+            >
+              Download
+            </button>
+            <button
+              type="button"
+              onClick={handleShareX}
+              className="flex h-11 flex-1 items-center justify-center rounded-full border border-border px-5 font-display text-xs uppercase tracking-[0.2em] text-foreground transition-all hover:border-emerald/50 hover:text-glow-emerald"
+            >
+              Share on X
+            </button>
+            <button
+              type="button"
+              onClick={handleCopy}
+              className="flex h-11 flex-1 items-center justify-center rounded-full border border-border px-5 font-display text-xs uppercase tracking-[0.2em] text-foreground transition-all hover:border-gold/50 hover:text-glow-gold"
+            >
+              Copy Link
+            </button>
           </div>
-        ) : (
-          <p className="text-sm italic text-muted">No AI verdict generated</p>
-        )}
-      </Reveal>
+        </Reveal>
+      </div>
 
-      {/* ════════ STARTUP VISION ════════ */}
-      <Reveal as="section" className="panel flex flex-col gap-4 p-6 sm:p-8">
-        <SectionLabel accent={accent}>Startup Idea</SectionLabel>
-        <h3 className="font-display text-xl text-glow-gold sm:text-2xl">
-          Startup Vision
-        </h3>
-        {startupIdea ? (
-          <p className="whitespace-pre-wrap text-base leading-relaxed text-foreground/90">
-            {startupIdea}
-          </p>
-        ) : (
-          <p className="text-sm italic text-muted">No startup idea available</p>
-        )}
-      </Reveal>
-
-      {/* ════════ PORTFOLIO SUMMARY ════════ */}
-      <Reveal as="section" className="panel flex flex-col gap-4 p-6 sm:p-8">
-        <SectionLabel accent={accent}>Portfolio Intelligence</SectionLabel>
-        <h3 className="font-display text-xl text-glow-gold sm:text-2xl">
-          Portfolio Summary
-        </h3>
-        {portfolioSummary ? (
-          <div className="relative">
-            <span
-              aria-hidden
-              className="absolute left-0 top-0 h-full w-px rounded"
-              style={{ background: `rgb(${accent} / 0.5)` }}
-            />
-            <RichText
-              text={portfolioSummary}
-              className="pl-5 text-base text-foreground/90"
-            />
-          </div>
-        ) : (
-          <p className="text-sm italic text-muted">
-            No portfolio summary available
-          </p>
-        )}
-        {portfolioUrl && (
-          <a
-            href={portfolioUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-mono text-xs tracking-wide text-muted underline-offset-4 transition-colors hover:text-glow-emerald hover:underline"
-          >
-            {portfolioUrl}
-          </a>
-        )}
-      </Reveal>
-
-      {/* ════════ DETECTED TECH STACK ════════ */}
-      <Reveal as="section" className="panel flex flex-col gap-5 p-6 sm:p-8">
-        <SectionLabel accent={accent}>Detected Tech Stack</SectionLabel>
-        {techGroups.length > 0 ? (
-          <div className="flex flex-col gap-5">
-            {techGroups.map((group) => (
-              <div key={group.category} className="flex flex-col gap-3">
-                <span className="text-xs uppercase tracking-[0.2em] text-muted">
-                  {group.category}
-                </span>
-                <div className="flex flex-wrap gap-2">
-                  {group.items.map((item) => (
-                    <span
-                      key={item}
-                      className="flex items-center gap-2 rounded-full border border-border bg-surface/60 px-3.5 py-1.5 font-mono text-xs tracking-wide text-foreground transition-all duration-300 hover:border-emerald/50 hover:text-glow-emerald hover:shadow-[0_0_16px_rgba(52,227,168,0.18)]"
-                    >
-                      <span className="h-1.5 w-1.5 rounded-full bg-gold-bright shadow-[0_0_8px_rgba(244,217,123,0.8)]" />
-                      {item}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-sm italic text-muted">
-            No technical signals were detected from the portfolio.
-          </p>
-        )}
-      </Reveal>
-
-      {/* ════════ GITHUB METRICS ════════ */}
-      <Reveal as="section" className="panel flex flex-col gap-5 p-6 sm:p-8">
-        <SectionLabel accent={accent}>GitHub Metrics</SectionLabel>
-        <div className="flex items-stretch">
-          <Stat label="Followers" value={followers} />
-          <div className="w-px bg-border" />
-          <Stat label="Following" value={following} />
-          <div className="w-px bg-border" />
-          <Stat label="Repositories" value={publicRepos} />
-        </div>
-        {bio && <p className="text-sm leading-relaxed text-muted">{bio}</p>}
-        {createdAt && (
-          <p className="text-xs uppercase tracking-[0.2em] text-muted/70">
-            On GitHub since {createdAt}
-          </p>
-        )}
-      </Reveal>
-
-      {/* ════════ FINAL VERDICT ════════ */}
+      {/* ════════ FINAL CTA ════════ */}
       <Reveal as="section" className="flex flex-col items-center gap-5 py-4 text-center">
         <hr className="rule-aurora w-full" />
         <p className="max-w-md font-display text-lg text-foreground">
@@ -472,7 +307,7 @@ export default function VerdictCard({ reputation, address = "" }) {
             href={`/passport/${address}`}
             className="pulse-glow flex h-14 items-center justify-center gap-2 rounded-full bg-surface-elevated px-10 font-display text-base uppercase tracking-[0.2em] text-gold-bright transition-all hover:scale-[1.03] hover:bg-surface"
           >
-            Generate Passport
+            View Full Passport
             <span aria-hidden>→</span>
           </Link>
         )}
