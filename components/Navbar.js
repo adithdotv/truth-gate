@@ -56,7 +56,7 @@ export default function Navbar() {
         {/* Links + wallet */}
         <div className="flex items-center gap-8">
           <div className="hidden items-center gap-8 text-sm tracking-wide text-muted sm:flex">
-            <Link href="/about" className="transition-colors hover:text-foreground">
+            <Link href="/#about" className="transition-colors hover:text-foreground">
               About
             </Link>
             <Link href="/submit" className="transition-colors hover:text-foreground">
