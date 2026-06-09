@@ -104,6 +104,9 @@ export default function Navbar() {
             <Link href="/submit" className="transition-colors hover:text-foreground">
               Submit
             </Link>
+            <Link href="/lookup" className="transition-colors hover:text-foreground">
+              Lookup
+            </Link>
           </div>
 
           {renderWalletButton()}
